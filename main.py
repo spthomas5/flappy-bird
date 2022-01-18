@@ -25,6 +25,7 @@ score = pygame.freetype.SysFont('menlo', 50, True)
 best_score_label = pygame.freetype.SysFont('menlo', 50, True)
 best_score = pygame.freetype.SysFont('menlo', 50, True)
 play_again = pygame.freetype.SysFont('menlo', 50, True)
+quit = pygame.freetype.SysFont('menlo', 50, True)
 
 # Sounds
 pygame.mixer.init()
@@ -51,13 +52,13 @@ def lose_screen(score):
     if bird.count > bird.best_score:
         bird.best_score = bird.count
 
-    pygame.draw.rect(screen, (0, 255, 145), pygame.Rect(470, 370, 500, 200))
+    pygame.draw.rect(screen, (0, 255, 145), pygame.Rect(470, 370, 500, 270))
     score_label.render_to(screen, (520, 400), "Score: ")
     score.render_to(screen, (750, 400), str(bird.count))
     best_score_label.render_to(screen, (520, 450), "Best: ")
     best_score_label.render_to(screen, (750, 450), str(bird.best_score))
-
     play_again.render_to(screen, (520, 500), 'p - Play Again')
+    quit.render_to(screen, (520, 560), 'q - Quit')
     pygame.display.update()
 
     run = True
@@ -66,10 +67,11 @@ def lose_screen(score):
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    run = False
                 if event.key == pygame.K_p:
                     bird.reset()
                     main()
-
 
 class Bird(pygame.sprite.Sprite):
     def __init__(self):
