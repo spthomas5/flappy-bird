@@ -1,12 +1,14 @@
 import os
 import random
 import pygame
+import pygame.freetype
 import time
 
 SIZE = width, height = 2560, 1600
 screen = pygame.display.set_mode(SIZE)
 DISPLAYSURF = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption("Flappy Bird!")
+pygame.mouse.set_visible(False)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (42, 104, 166)
@@ -17,9 +19,12 @@ bg = pygame.image.load(os.path.join('assets', '4622710.webp'))
 bg = pygame.transform.scale(bg, (1500, 900))
 
 # Text
-pygame.font.init()
-font = pygame.font.SysFont('Comic Sans MS', 150)
-play_again = font.render('PRESS P TO PLAY AGAIN', False, (0, 0, 0))
+pygame.freetype.init()
+score_label = pygame.freetype.SysFont('menlo', 50, True)
+score = pygame.freetype.SysFont('menlo', 50, True)
+best_score_label = pygame.freetype.SysFont('menlo', 50, True)
+best_score = pygame.freetype.SysFont('menlo', 50, True)
+play_again = pygame.freetype.SysFont('menlo', 50, True)
 
 # Sounds
 pygame.mixer.init()
@@ -28,13 +33,14 @@ jump_sound = pygame.mixer.Sound(os.path.join('assets', 'wing.mp3'))
 die_sound = pygame.mixer.Sound(os.path.join('assets', 'die.mp3'))
 
 
-def draw_screen(bird, counter):
+def draw_screen(bird, score):
     screen.blit(bg, (0 , 0))
     if bird.velocity == 15:
         screen.blit(bird.down, (bird.rect.x, bird.rect.y))
     else:
         screen.blit(bird.up, (bird.rect.x, bird.rect.y))
-    screen.blit(counter, (500, 500))
+    if bird.active:
+        score.render_to(screen, (100, 100), str(bird.count))
     top_pipe_group.draw(screen)
     bottom_pipe_group.draw(screen)
     pygame.display.update()
@@ -42,8 +48,16 @@ def draw_screen(bird, counter):
 
 def lose_screen(score):
     die_sound.play()
-    screen.blit(score, (400, 450))
-    screen.blit(play_again, (100, 600))
+    if bird.count > bird.best_score:
+        bird.best_score = bird.count
+
+    pygame.draw.rect(screen, (0, 255, 145), pygame.Rect(470, 370, 500, 200))
+    score_label.render_to(screen, (520, 400), "Score: ")
+    score.render_to(screen, (750, 400), str(bird.count))
+    best_score_label.render_to(screen, (520, 450), "Best: ")
+    best_score_label.render_to(screen, (750, 450), str(bird.best_score))
+
+    play_again.render_to(screen, (520, 500), 'p - Play Again')
     pygame.display.update()
 
     run = True
@@ -70,11 +84,14 @@ class Bird(pygame.sprite.Sprite):
         self.incrementing = False
         self.rect = self.rect.inflate(-35, -60)
         self.can_jump = True
+        self.active = True
+        self.best_score = 0
 
     def reset(self):
         self.count = 0
         self.incrementing = False
         self.can_jump = True
+        self.active = True
 
     def increment(self):
         self.count += 1
@@ -158,8 +175,7 @@ def main():
 
     while run:
         clock.tick(FPS)
-        counter = font.render(str(bird.count), False, (0, 0, 0))
-        draw_screen(bird, counter)
+        draw_screen(bird, score)
         bird.rect.y += bird.velocity
 
 
@@ -192,7 +208,8 @@ def main():
         if (bird.rect.y > 900):
             bird.velocity = 0
             run = False
-            score = font.render("Score: " + str(bird.count), False, (0, 0, 0))
+            bird.active = False
+            draw_screen(bird, score)
             lose_screen(score)
 
         bird.velocity += 1
