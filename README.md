@@ -1,4 +1,4 @@
-Flappy-bird: An imitation of an old game
+flappy-bird: An imitation of an old game
 
 This is a game I wrote using Python, based on an old phone game that the whole world was addicted to in 2014. Most of the code in this repository uses the Pygame 
 library. The bird and the pipes are written using the built-in Sprite class, allowing me to define functions to efficiently have the pipes move across the screen,
