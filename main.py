@@ -3,6 +3,7 @@ import random
 import pygame
 import pygame.freetype
 import time
+from win32api import GetSystemMetrics # do pip install pywin32
 
 SIZE = width, height = 2560, 1600
 screen = pygame.display.set_mode(SIZE)
@@ -14,9 +15,11 @@ RED = (255, 0, 0)
 BLUE = (42, 104, 166)
 FPS = 60
 
+widthbg = GetSystemMetrics(0)
+heightbg = GetSystemMetrics(1)
 
 bg = pygame.image.load(os.path.join('assets', '4622710.webp'))
-bg = pygame.transform.scale(bg, (1500, 900))
+bg = pygame.transform.scale(bg, (widthbg, heightbg))
 
 # Text
 pygame.freetype.init()
